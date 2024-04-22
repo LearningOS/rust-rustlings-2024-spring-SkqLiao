@@ -1,8 +1,7 @@
 /*
-	heap
-	This question requires you to implement a binary heap function
+    heap
+    This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -38,6 +37,14 @@ where
 
     pub fn add(&mut self, value: T) {
         //TODO
+        self.count += 1;
+        self.items.push(value);
+        let mut now = self.count;
+        while now > 1 && (self.comparator)(&self.items[now], &self.items[self.parent_idx(now)]) {
+            let parent = self.parent_idx(now);
+            self.items.swap(now, parent);
+            now = parent;
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +64,19 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
+        if self.right_child_idx(idx) > self.count {
+            self.left_child_idx(idx)
+        } else {
+            if (self.comparator)(
+                &self.items[self.left_child_idx(idx)],
+                &self.items[self.right_child_idx(idx)],
+            ) {
+                self.left_child_idx(idx)
+            } else {
+                self.right_child_idx(idx)
+            }
+        }
         //TODO
-		0
     }
 }
 
@@ -85,7 +103,22 @@ where
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+        if self.count == 0 {
+            return None;
+        }
+        self.items.swap(1, self.count);
+        let result = self.items.pop();
+        self.count -= 1;
+        let mut now = 1;
+        while self.children_present(now) {
+            let smallest_child = self.smallest_child_idx(now);
+            if (self.comparator)(&self.items[now], &self.items[smallest_child]) {
+                break;
+            }
+            self.items.swap(now, smallest_child);
+            now = smallest_child;
+        }
+        return result;
     }
 }
 
